@@ -25,3 +25,4 @@ func (c *UserController) Register(ctx *fiber.Ctx) error {
 	}
 	return utils.Success(ctx, "User berhasil didaftarkan", nil)
 }
+
