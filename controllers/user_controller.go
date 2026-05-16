@@ -5,6 +5,7 @@ import (
 	"github.com/ilhamhafizha/ManagementApp-GO/models"
 	"github.com/ilhamhafizha/ManagementApp-GO/services"
 	"github.com/ilhamhafizha/ManagementApp-GO/utils"
+	"github.com/jinzhu/copier"
 )
 
 type UserController struct {
@@ -23,6 +24,8 @@ func (c *UserController) Register(ctx *fiber.Ctx) error {
 	if err := c.service.Register(user); err != nil {
 		return utils.BadRequest(ctx, "Gagal registrasi user", err.Error())
 	}
-	return utils.Success(ctx, "User berhasil didaftarkan", nil)
+	var userResponse models.UserResponse
+	_ = copier.Copy(&userResponse, user)
+	return utils.Success(ctx, "User berhasil didaftarkan", userResponse)
 }
 
