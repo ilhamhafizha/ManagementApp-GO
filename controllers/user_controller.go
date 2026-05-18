@@ -53,3 +53,16 @@ func (c *UserController) Login(ctx *fiber.Ctx) error {
 	})
 }
 
+func (c *UserController) GetUser(ctx *fiber.Ctx) error {
+	id := ctx.Params("id")
+	user, err := c.service.GetByPublicID(id)
+	if err != nil {
+		return utils.NotFound(ctx, "User tidak ditemukan", err.Error())
+	}
+	var userResponse models.UserResponse
+	_ = copier.Copy(&userResponse, user)
+	if err != nil {
+		return utils.BadRequest(ctx, "Gagal parsing data", err.Error())
+	}
+	return utils.Success(ctx, "User ditemukan", userResponse)
+}
