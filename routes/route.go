@@ -14,4 +14,5 @@ func Setup(app *fiber.App, uc *controllers.UserController) {
 	}
 	
 	app.Post("v1/api/register", uc.Register)
-} 
+	app.Post("v1/api/login", uc.Login)
+}

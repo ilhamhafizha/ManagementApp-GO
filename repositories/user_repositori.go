@@ -27,3 +27,4 @@ func (r *userRepository) FindByEmail(email string) (*models.User, error) {
 	
 	return &user, err
 }
+
