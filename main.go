@@ -19,6 +19,11 @@ func main(){
 	seed.SeedAdmin()
 	app := fiber.New()
 
+	app.All("*", func(c *fiber.Ctx) error {
+	log.Println("METHOD:", c.Method(), "PATH:", c.Path())
+	return c.Next()
+	})
+
 	userRepo := repositories.NewUserRepository()
 	userService := services.NewUserService(userRepo)
 	userController := controllers.NewUserController(userService)

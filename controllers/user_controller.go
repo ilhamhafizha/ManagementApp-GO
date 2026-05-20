@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 	"github.com/ilhamhafizha/ManagementApp-GO/models"
 	"github.com/ilhamhafizha/ManagementApp-GO/services"
 	"github.com/ilhamhafizha/ManagementApp-GO/utils"
@@ -108,4 +109,40 @@ func (c *UserController) GetUserPagination(ctx *fiber.Ctx) error {
 
 	return utils.SuccessPagination(ctx, "Data ditemukan", userResp, meta)
 }
-	
+
+func (c *UserController) UpdateUser(ctx *fiber.Ctx) error {
+	id := ctx.Params("id")
+	publicID, err := uuid.Parse(id)
+	if err != nil {
+		return utils.BadRequest(ctx, "Invalid ID Format", err.Error())
+	}
+	var user models.User
+	if err := ctx.BodyParser(&user); err != nil {
+		return utils.BadRequest(ctx, "Gagal Parsing Data", err.Error())
+	}
+	user.PublicID = publicID
+
+	if err := c.service.Update(&user); err != nil {
+		return utils.BadRequest(ctx, "Gagal Update Data", err.Error())
+	}
+
+	userUpdated, err := c.service.GetByPublicID(id)
+	if err != nil {
+		return utils.InternalServerError(ctx, "Gagal Ambil Data", err.Error())
+	}
+
+	var userResp models.UserResponse
+	err = copier.Copy(&userResp, &userUpdated)
+	if err != nil {
+		return utils.InternalServerError(ctx, "Error parsing data", err.Error())
+	}
+	return utils.Success(ctx, "Berhasil Update data", userResp)
+}
+
+func (c *UserController) DeleteUser(ctx *fiber.Ctx) error {
+	id, _ := strconv.Atoi(ctx.Params("id"))
+	if err := c.service.Delete(uint(id)); err != nil {
+		return utils.InternalServerError(ctx, "Gagal Menghapus Data", err.Error())
+	}
+	return utils.Success(ctx, "Berhasil menghapus data", id)
+}
