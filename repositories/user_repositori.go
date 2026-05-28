@@ -7,7 +7,6 @@ import (
 	"github.com/ilhamhafizha/ManagementApp-GO/models"
 )
 
-
 type UserRepository interface {
 	Create(user *models.User) error
 	FindByEmail(email string) (*models.User, error)
@@ -52,7 +51,6 @@ func (r *userRepository) FindAllPagination(filter, sort string, limit, ofset int
 
 	db := config.DB.Model(&models.User{})
 
-	
 	if filter != "" {
 		filterPattern := "%" + filter + "%"
 		db = db.Where("name Ilike ? OR email Ilike ?", filterPattern, filterPattern)
@@ -63,7 +61,7 @@ func (r *userRepository) FindAllPagination(filter, sort string, limit, ofset int
 	}
 
 	if sort != "" {
-		// sort=name (ASC ascending ) sort =-name (DESC descending)
+
 		if sort == "-id" {
 			sort = "-internal_id"
 		} else if sort == "id" {

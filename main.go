@@ -12,7 +12,7 @@ import (
 	"github.com/ilhamhafizha/ManagementApp-GO/services"
 )
 
-func main(){
+func main() {
 	config.LoadEnv()
 	config.ConnectDB()
 
@@ -20,15 +20,19 @@ func main(){
 	app := fiber.New()
 
 	app.All("*", func(c *fiber.Ctx) error {
-	log.Println("METHOD:", c.Method(), "PATH:", c.Path())
-	return c.Next()
+		log.Println("METHOD:", c.Method(), "PATH:", c.Path())
+		return c.Next()
 	})
 
 	userRepo := repositories.NewUserRepository()
 	userService := services.NewUserService(userRepo)
 	userController := controllers.NewUserController(userService)
 
-	routes.Setup(app, userController)
+	boardRepo := repositories.NewBoardRepository()
+	boardService := services.NewBoardService(boardRepo, userRepo)
+	boarController := controllers.NewBoardController(boardService)
+
+	routes.Setup(app, userController, boarController)
 
 	port := config.AppConfig.AppPort
 	log.Println("Server is running on port : " + port)

@@ -11,19 +11,19 @@ import (
 	"github.com/joho/godotenv"
 )
 
-func Setup(app *fiber.App, uc *controllers.UserController) {
+func Setup(app *fiber.App, uc *controllers.UserController, bc *controllers.BoardController) {
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("No .env file found.")
 	}
-	
+
 	app.Post("/api/v1/register", uc.Register)
-    app.Post("/api/v1/login", uc.Login)
+	app.Post("/api/v1/login", uc.Login)
 
 	api := app.Group("/api/v1", jwtware.New(jwtware.Config{
 		SigningKey: []byte(config.AppConfig.JWTSecret),
 		ContextKey: "user",
-		ErrorHandler: func (c *fiber.Ctx, err error) error {
+		ErrorHandler: func(c *fiber.Ctx, err error) error {
 			return utils.Unauthorized(c, "Error Unauthorized", err.Error())
 		},
 	}))
@@ -33,5 +33,8 @@ func Setup(app *fiber.App, uc *controllers.UserController) {
 	userGroup.Get("/:id", uc.GetUser)
 	userGroup.Put("/:id", uc.UpdateUser)
 	userGroup.Delete("/:id", uc.DeleteUser)
+
+	boardGroup := api.Group("/boards")
+	boardGroup.Post("/", bc.CreateBoard)
 
 }
