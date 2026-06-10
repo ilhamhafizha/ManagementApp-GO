@@ -72,3 +72,21 @@ func (c *ListController) GetListOnBoard(ctx *fiber.Ctx) error {
 
 	return utils.Success(ctx, "List Ditemukan", lists)
 }
+
+func (c *ListController) DeleteList(ctx *fiber.Ctx) error {
+	publicID := ctx.Params("id")
+	if _, err := uuid.Parse(publicID); err != nil {
+		return utils.BadRequest(ctx, "ID tidak valid", err.Error())
+	}
+
+	list, err := c.service.GetByPublicID(publicID)
+	if err != nil {
+		return utils.NotFound(ctx, "List tidak ditemukan", err.Error())
+	}
+
+	if err := c.service.Delete(uint(list.InternalID)); err != nil {
+		return utils.InternalServerError(ctx, "Gagal Menghapus List", err.Error())
+	}
+
+	return utils.Success(ctx, "List Berhasil Dihapus", list)
+}
