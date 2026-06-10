@@ -54,6 +54,8 @@ func (s *listService) GetByBoardID(boardPublicID string) (*ListWithOrder, error)
 		return nil, fmt.Errorf("failed to get lists: %w", err)
 	}
 
+	fmt.Println(lists)
+	fmt.Println(position)
 	orderedList := utils.SortListsByPosition(lists, position)
 	return &ListWithOrder{Positions: position, Lists: orderedList}, nil
 }
@@ -96,8 +98,8 @@ func (s *listService) Create(list *models.List) error {
 	res := tx.Where("board_internal_id = ?", board.InternalID).First(&position)
 	if errors.Is(res.Error, gorm.ErrRecordNotFound) {
 		position = models.ListPosition{
-			PublicID: uuid.New(),
-			//BoardInternalID: board.InternalID,
+			PublicID:  uuid.New(),
+			BoardID:   board.InternalID,
 			ListOrder: []uuid.UUID{list.PublicID},
 		}
 

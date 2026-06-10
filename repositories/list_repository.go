@@ -30,7 +30,7 @@ func (r *listRepository) Create(list *models.List) error {
 func (r *listRepository) Update(list *models.List) error {
 	return config.DB.Model(&models.List{}).Where("public_id = ?", list.PublicID).
 		Updates(map[string]interface{}{
-			"tittle": list.Title,
+			"title": list.Title,
 		}).Error
 }
 
@@ -48,9 +48,16 @@ func (r *listRepository) GetCardPosition(listPublicID string) ([]uuid.UUID, erro
 	return position.CardOrder, err
 }
 
-func (r *listRepository) FindByBoardID(boardID string) ([]models.List, error) {
+func (r *listRepository) FindByBoardID(boardPublicID string) ([]models.List, error) {
 	var lists []models.List
-	err := config.DB.Where("board_internal_id = ?", boardID).Order("internal_id ASC").Find(&lists).Error
+
+	err := config.DB.
+		Table("lists").
+		Joins("JOIN boards ON boards.internal_id = lists.board_internal_id").
+		Where("boards.public_id = ?", boardPublicID).
+		Order("lists.internal_id ASC").
+		Find(&lists).Error
+
 	return lists, err
 }
 

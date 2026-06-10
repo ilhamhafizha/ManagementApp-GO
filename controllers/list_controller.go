@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 	"github.com/ilhamhafizha/ManagementApp-GO/models"
 	"github.com/ilhamhafizha/ManagementApp-GO/services"
 	"github.com/ilhamhafizha/ManagementApp-GO/utils"
@@ -25,4 +26,49 @@ func (c *ListController) CreateList(ctx *fiber.Ctx) error {
 	}
 
 	return utils.Success(ctx, "List Berhasil Dibuat", list)
+}
+
+func (c *ListController) UpdateList(ctx *fiber.Ctx) error {
+	publicID := ctx.Params("id")
+	list := new(models.List)
+	if err := ctx.BodyParser(list); err != nil {
+		return utils.BadRequest(ctx, "Gagal Membaca Request", err.Error())
+	}
+
+	if _, err := uuid.Parse(publicID); err != nil {
+		return utils.BadRequest(ctx, "ID tidak valid", err.Error())
+	}
+
+	existingList, err := c.service.GetByPublicID(publicID)
+	if err != nil {
+		return utils.NotFound(ctx, "List tidak ditemukan", err.Error())
+	}
+
+	list.InternalID = existingList.InternalID
+	list.PublicID = existingList.PublicID
+
+	if err := c.service.Update(list); err != nil {
+		return utils.BadRequest(ctx, "Gagal Memperbaharui List", err.Error())
+	}
+
+	updatedList, err := c.service.GetByPublicID(publicID)
+	if err != nil {
+		return utils.NotFound(ctx, "List tidak ditemukan", err.Error())
+	}
+
+	return utils.Success(ctx, "List Memperbaharui Dibuat", updatedList)
+}
+
+func (c *ListController) GetListOnBoard(ctx *fiber.Ctx) error {
+	boardPublicID := ctx.Params("board_id")
+	if _, err := uuid.Parse(boardPublicID); err != nil {
+		return utils.BadRequest(ctx, "ID tidak valid", err.Error())
+	}
+
+	lists, err := c.service.GetByBoardID(boardPublicID)
+	if err != nil {
+		return utils.NotFound(ctx, "List tidak ditemukan", err.Error())
+	}
+
+	return utils.Success(ctx, "List Ditemukan", lists)
 }
