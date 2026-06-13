@@ -11,7 +11,11 @@ import (
 	"github.com/joho/godotenv"
 )
 
-func Setup(app *fiber.App, uc *controllers.UserController, bc *controllers.BoardController, lc *controllers.ListController) {
+func Setup(app *fiber.App,
+	uc *controllers.UserController,
+	bc *controllers.BoardController,
+	lc *controllers.ListController,
+	cc *controllers.CardController) {
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("No .env file found.")
@@ -47,4 +51,9 @@ func Setup(app *fiber.App, uc *controllers.UserController, bc *controllers.Board
 	listGroup.Post("/", lc.CreateList)
 	listGroup.Put("/:id", lc.UpdateList)
 	listGroup.Delete("/:id", lc.DeleteList)
+
+	//card
+	cardGroup := api.Group("/cards")
+	cardGroup.Post("/", cc.CreateCard)
+	cardGroup.Put("/:id", cc.UpdateCard)
 }
