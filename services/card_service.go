@@ -210,9 +210,20 @@ func (s *cardService) GetByListID(listPublicID string) ([]models.Card, error) {
 	}
 
 	// ambil card position
-	position, err := s.cardRepo.FindCardPositionByListID(list.InternalID)
+	//position, err := s.cardRepo.FindCardPositionByListID(list.InternalID)
+	//if err != nil {
+	//	return nil, fmt.Errorf("failed to get card position: %w", err)
+	//}
+	var position *models.CardPosition
+
+	position, err = s.cardRepo.FindCardPositionByListID(list.InternalID)
+
 	if err != nil {
-		return nil, fmt.Errorf("failed to get card position: %w", err)
+		if !errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, fmt.Errorf("failed to get card position: %w", err)
+		}
+
+		position = nil
 	}
 
 	// ambil card

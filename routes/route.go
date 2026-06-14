@@ -52,9 +52,12 @@ func Setup(app *fiber.App,
 	listGroup.Put("/:id", lc.UpdateList)
 	listGroup.Delete("/:id", lc.DeleteList)
 
+	listGroup.Get("/:list_id/cards", cc.GetListCard)
+
 	//card
 	cardGroup := api.Group("/cards")
 	cardGroup.Post("/", cc.CreateCard)
 	cardGroup.Put("/:id", cc.UpdateCard)
 	cardGroup.Delete("/:id", cc.DeleteCard)
+	cardGroup.Get("/:id", cc.GetCardDetail)
 }
